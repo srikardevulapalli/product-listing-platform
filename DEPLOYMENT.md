@@ -45,8 +45,8 @@ Create `backend/.env`:
 OPENAI_API_KEY=sk-your-openai-api-key-here
 FIREBASE_CREDENTIALS_PATH=firebase-service-account.json
 FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
-API_SECRET_KEY=your-random-secret-key-here
-FRONTEND_URL=http://localhost:3000
+GOOGLE_CLOUD_PROJECT=your-project-id
+FRONTEND_URL=http://localhost:5000
 ```
 
 ### 4. Frontend Configuration
@@ -62,8 +62,9 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
 NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
 
 NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_API_SECRET_KEY=same-secret-key-as-backend
 ```
+
+**Note**: No API secret key is needed in the frontend. Authentication is handled exclusively via Firebase ID tokens.
 
 ### 5. Run Locally
 
