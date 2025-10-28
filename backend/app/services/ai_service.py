@@ -5,11 +5,27 @@ from typing import Dict, Optional, List
 
 
 class AIService:
+    _instance = None
+    _initialized = False
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(AIService, cls).__new__(cls)
+        return cls._instance
+    
     def __init__(self):
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            raise ValueError("OPENAI_API_KEY environment variable is not set")
-        self.client = OpenAI(api_key=api_key)
+        if not self._initialized:
+            self._client = None
+            self._initialized = True
+    
+    @property
+    def client(self):
+        if self._client is None:
+            api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key or api_key == "placeholder_will_be_set_by_user":
+                raise ValueError("OPENAI_API_KEY environment variable is not set or is still a placeholder. Please set a valid OpenAI API key.")
+            self._client = OpenAI(api_key=api_key)
+        return self._client
     
     def generate_product_description(self, image_data: str) -> Dict[str, any]:
         try:

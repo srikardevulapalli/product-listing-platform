@@ -3,23 +3,59 @@ from firebase_admin import credentials, firestore, storage, auth
 from typing import Dict, List, Optional
 from datetime import datetime
 import os
+import json
 
 
 class FirebaseService:
+    _instance = None
+    _initialized = False
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(FirebaseService, cls).__new__(cls)
+        return cls._instance
+    
     def __init__(self):
+        if not self._initialized:
+            self._db = None
+            self._bucket = None
+            self._initialized = True
+    
+    def _initialize_firebase(self):
         if not firebase_admin._apps:
             cred_path = os.getenv("FIREBASE_CREDENTIALS_PATH")
-            if cred_path and os.path.exists(cred_path):
-                cred = credentials.Certificate(cred_path)
-            else:
-                cred = credentials.ApplicationDefault()
             
-            firebase_admin.initialize_app(cred, {
-                'storageBucket': os.getenv("FIREBASE_STORAGE_BUCKET")
-            })
-        
-        self.db = firestore.client()
-        self.bucket = storage.bucket()
+            try:
+                if cred_path and os.path.exists(cred_path):
+                    cred = credentials.Certificate(cred_path)
+                    print(f"Using Firebase credentials from: {cred_path}")
+                else:
+                    print("Warning: No Firebase credentials file found. Using Application Default Credentials.")
+                    cred = credentials.ApplicationDefault()
+                
+                storage_bucket = os.getenv("FIREBASE_STORAGE_BUCKET")
+                
+                firebase_admin.initialize_app(cred, {
+                    'storageBucket': storage_bucket
+                })
+                print("Firebase initialized successfully")
+            except Exception as e:
+                print(f"Error initializing Firebase: {e}")
+                raise
+    
+    @property
+    def db(self):
+        if self._db is None:
+            self._initialize_firebase()
+            self._db = firestore.client()
+        return self._db
+    
+    @property
+    def bucket(self):
+        if self._bucket is None:
+            self._initialize_firebase()
+            self._bucket = storage.bucket()
+        return self._bucket
     
     def create_product(self, product_data: Dict) -> str:
         product_data['created_at'] = datetime.utcnow().isoformat()
@@ -91,6 +127,8 @@ class FirebaseService:
     
     def verify_firebase_token(self, token: str) -> Optional[Dict]:
         try:
+            if not firebase_admin._apps:
+                self._initialize_firebase()
             decoded_token = auth.verify_id_token(token)
             return decoded_token
         except Exception as e:
@@ -99,6 +137,8 @@ class FirebaseService:
     
     def get_user_claims(self, uid: str) -> Dict:
         try:
+            if not firebase_admin._apps:
+                self._initialize_firebase()
             user = auth.get_user(uid)
             return user.custom_claims or {}
         except Exception as e:
@@ -107,6 +147,8 @@ class FirebaseService:
     
     def set_admin_claim(self, uid: str, is_admin: bool = True) -> bool:
         try:
+            if not firebase_admin._apps:
+                self._initialize_firebase()
             auth.set_custom_user_claims(uid, {'admin': is_admin})
             return True
         except Exception as e:
