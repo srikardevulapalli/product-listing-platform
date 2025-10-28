@@ -2,12 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import List, Optional
 from app.schemas.product import ProductResponse, ProductStatusUpdate
 from app.services.firebase_service import firebase_service
-from app.middleware.auth import require_admin, verify_api_key
+from app.middleware.auth import require_admin
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 
-@router.get("/products", response_model=List[ProductResponse], dependencies=[Depends(verify_api_key)])
+@router.get("/products", response_model=List[ProductResponse])
 async def get_all_products(
     status: Optional[str] = None,
     current_user: dict = Depends(require_admin)
@@ -19,7 +19,7 @@ async def get_all_products(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.patch("/products/{product_id}/status", response_model=dict, dependencies=[Depends(verify_api_key)])
+@router.patch("/products/{product_id}/status", response_model=dict)
 async def update_product_status(
     product_id: str,
     status_update: ProductStatusUpdate,
@@ -43,27 +43,6 @@ async def update_product_status(
             "message": f"Product status updated to {status_update.status.value}",
             "product_id": product_id,
             "new_status": status_update.status.value
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.post("/set-admin/{uid}", response_model=dict, dependencies=[Depends(verify_api_key)])
-async def set_admin_role(
-    uid: str,
-    current_user: dict = Depends(require_admin)
-):
-    try:
-        success = firebase_service.set_admin_claim(uid, True)
-        
-        if not success:
-            raise HTTPException(status_code=500, detail="Failed to set admin role")
-        
-        return {
-            "message": f"Admin role granted to user {uid}",
-            "uid": uid
         }
     except HTTPException:
         raise

@@ -1,19 +1,6 @@
 from fastapi import Header, HTTPException, Depends
 from typing import Optional
-import os
 from app.services.firebase_service import firebase_service
-
-
-def verify_api_key(x_api_key: Optional[str] = Header(None)) -> bool:
-    api_secret = os.getenv("API_SECRET_KEY")
-    
-    if not api_secret:
-        raise HTTPException(status_code=500, detail="API secret key not configured")
-    
-    if not x_api_key or x_api_key != api_secret:
-        raise HTTPException(status_code=401, detail="Invalid or missing API key")
-    
-    return True
 
 
 def get_current_user(authorization: Optional[str] = Header(None)) -> dict:

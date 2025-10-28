@@ -1,19 +1,21 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
-from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException
+from typing import List
 from app.schemas.product import (
     ProductCreate, ProductUpdate, ProductResponse, 
-    ProductStatusUpdate, AIGenerationRequest, AIGenerationResponse
+    AIGenerationRequest, AIGenerationResponse
 )
 from app.services.firebase_service import firebase_service
 from app.services.ai_service import ai_service
-from app.middleware.auth import get_current_user, verify_api_key
-import base64
+from app.middleware.auth import get_current_user
 
 router = APIRouter(prefix="/products", tags=["products"])
 
 
-@router.post("/generate-ai-description", response_model=AIGenerationResponse, dependencies=[Depends(verify_api_key)])
-async def generate_ai_description(request: AIGenerationRequest):
+@router.post("/generate-ai-description", response_model=AIGenerationResponse)
+async def generate_ai_description(
+    request: AIGenerationRequest,
+    current_user: dict = Depends(get_current_user)
+):
     try:
         result = ai_service.generate_product_description(request.image_data)
         return AIGenerationResponse(**result)
@@ -21,7 +23,7 @@ async def generate_ai_description(request: AIGenerationRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/", response_model=dict, dependencies=[Depends(verify_api_key)])
+@router.post("/", response_model=dict)
 async def create_product(
     product: ProductCreate,
     current_user: dict = Depends(get_current_user)
@@ -42,7 +44,7 @@ async def create_product(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/my-products", response_model=List[ProductResponse], dependencies=[Depends(verify_api_key)])
+@router.get("/my-products", response_model=List[ProductResponse])
 async def get_my_products(current_user: dict = Depends(get_current_user)):
     try:
         products = firebase_service.get_products_by_user(current_user['uid'])
@@ -51,7 +53,7 @@ async def get_my_products(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/{product_id}", response_model=ProductResponse, dependencies=[Depends(verify_api_key)])
+@router.get("/{product_id}", response_model=ProductResponse)
 async def get_product(
     product_id: str,
     current_user: dict = Depends(get_current_user)
@@ -72,7 +74,7 @@ async def get_product(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.patch("/{product_id}", response_model=dict, dependencies=[Depends(verify_api_key)])
+@router.patch("/{product_id}", response_model=dict)
 async def update_product(
     product_id: str,
     product_update: ProductUpdate,
@@ -104,7 +106,7 @@ async def update_product(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.delete("/{product_id}", response_model=dict, dependencies=[Depends(verify_api_key)])
+@router.delete("/{product_id}", response_model=dict)
 async def delete_product(
     product_id: str,
     current_user: dict = Depends(get_current_user)
