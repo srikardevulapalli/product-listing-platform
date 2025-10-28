@@ -75,8 +75,9 @@ pip install -r requirements.txt
 OPENAI_API_KEY=your_openai_api_key
 FIREBASE_CREDENTIALS_PATH=path_to_service_account.json
 FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-API_SECRET_KEY=your_secret_key
-FRONTEND_URL=http://localhost:3000
+GOOGLE_CLOUD_PROJECT=your-project-id
+FRONTEND_URL=http://localhost:5000
+MASTER_ADMIN_KEY=your_secure_master_admin_key
 ```
 
 4. Download Firebase service account credentials:
@@ -111,15 +112,16 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 
 NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_API_SECRET_KEY=your_secret_key
 ```
+
+**Note**: No API secret key is needed in the frontend. Authentication is handled exclusively via Firebase ID tokens.
 
 4. Run the development server:
 ```bash
 npm run dev
 ```
 
-The application will be available at `http://localhost:3000`
+The application will be available at `http://localhost:5000`
 
 ### Firebase Configuration
 
@@ -135,10 +137,15 @@ The application will be available at `http://localhost:3000`
 
 3. **Set Admin User** (after first user registration):
    ```bash
-   curl -X POST http://localhost:8000/admin/set-admin/{user_uid} \
-     -H "X-API-Key: your_api_secret_key" \
-     -H "Authorization: Bearer {firebase_id_token}"
+   curl -X POST http://localhost:8000/admin/set-admin-role \
+     -H "Content-Type: application/json" \
+     -d '{
+       "user_id": "firebase_user_uid",
+       "master_key": "your_master_admin_key"
+     }'
    ```
+   
+   See `ADMIN_SETUP.md` for detailed admin setup instructions.
 
 ## API Documentation
 
@@ -180,12 +187,15 @@ Once the backend is running, visit:
 
 ## Security Features
 
-- API key authentication for backend endpoints
-- Firebase ID token validation
-- Role-based access control (admin)
-- Firestore security rules
+- Firebase ID token authentication for all API endpoints
+- Master key authentication for admin role assignment
+- Role-based access control via Firebase custom claims
+- Firestore security rules for data isolation
 - Storage security rules with file size and type validation
 - Environment variable protection
+- No exposed API keys in frontend
+
+See `SECURITY.md` for detailed security architecture.
 
 ## License
 
