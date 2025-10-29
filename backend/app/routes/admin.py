@@ -37,13 +37,18 @@ async def set_admin_role(request: SetAdminRequest):
         )
     
     try:
-        firebase_service.set_custom_claims(request.user_id, {'admin': True})
+        success = firebase_service.set_admin_claim(request.user_id, is_admin=True)
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to set admin role")
         
         return {
             "message": f"Admin role successfully set for user {request.user_id}",
             "user_id": request.user_id,
             "note": "User must log out and log back in for the claim to take effect"
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -76,13 +81,18 @@ async def revoke_admin_role(request: SetAdminRequest):
         )
     
     try:
-        firebase_service.set_custom_claims(request.user_id, {'admin': False})
+        success = firebase_service.set_admin_claim(request.user_id, is_admin=False)
+        
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to revoke admin role")
         
         return {
             "message": f"Admin role successfully revoked for user {request.user_id}",
             "user_id": request.user_id,
             "note": "User must log out and log back in for the change to take effect"
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
