@@ -29,7 +29,11 @@ class AIService:
     
     def generate_product_description(self, image_data: str) -> Dict[str, any]:
         try:
+            image_format = "jpeg"
             if image_data.startswith('data:image'):
+                format_match = image_data.split(';')[0].split('/')
+                if len(format_match) > 1:
+                    image_format = format_match[1]
                 image_data = image_data.split(',')[1]
             
             prompt = """Analyze this product image and provide:
@@ -55,7 +59,7 @@ KEYWORDS: [keyword1, keyword2, keyword3]"""
                             {
                                 "type": "image_url",
                                 "image_url": {
-                                    "url": f"data:image/jpeg;base64,{image_data}"
+                                    "url": f"data:image/{image_format};base64,{image_data}"
                                 }
                             }
                         ]
