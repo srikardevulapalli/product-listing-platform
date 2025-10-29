@@ -67,11 +67,11 @@ export default function LoginPage() {
         <CardHeader className="space-y-2 pb-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
           <div className="flex items-center justify-center mb-2">
             <div className="h-14 w-14 rounded-full bg-white/20 flex items-center justify-center">
-              <LogIn className="h-7 w-7" />
+              <LogIn className="h-7 w-7 text-white" />
             </div>
           </div>
-          <CardTitle className="text-center text-2xl">Login</CardTitle>
-          <CardDescription className="text-center text-blue-100">
+          <CardTitle className="text-center text-2xl text-white">Login</CardTitle>
+          <CardDescription className="text-center text-white/90">
             Sign in to your account to continue
           </CardDescription>
         </CardHeader>
