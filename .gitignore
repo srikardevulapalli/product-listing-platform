@@ -63,3 +63,7 @@ coverage/
 # Logs
 *.log
 logs/
+
+.local/
+.config/
+.cache/
