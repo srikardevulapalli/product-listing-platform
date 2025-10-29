@@ -199,7 +199,7 @@ export default function DashboardPage() {
               Start by uploading your first product. Our AI will help you create amazing descriptions!
             </p>
             <Link href="/upload">
-              <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md">
+              <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md text-white">
                 <Upload className="mr-2 h-4 w-4" />
                 Upload Your First Product
               </Button>
