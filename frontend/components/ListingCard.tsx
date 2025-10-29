@@ -34,6 +34,7 @@ const statusConfig = {
 
 export default function ListingCard({ product, onDelete }: ListingCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const [showAllTags, setShowAllTags] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const config = statusConfig[product.status];
   const StatusIcon = config.icon;
@@ -109,7 +110,7 @@ export default function ListingCard({ product, onDelete }: ListingCardProps) {
         )}
         {product.keywords && product.keywords.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-3">
-            {product.keywords.slice(0, 4).map((keyword, index) => (
+            {(showAllTags ? product.keywords : product.keywords.slice(0, 4)).map((keyword, index) => (
               <span
                 key={index}
                 className="px-2.5 py-1 text-xs bg-blue-50 text-blue-700 rounded-full border border-blue-200 hover:bg-blue-100 transition-colors"
@@ -118,9 +119,12 @@ export default function ListingCard({ product, onDelete }: ListingCardProps) {
               </span>
             ))}
             {product.keywords.length > 4 && (
-              <span className="px-2.5 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
-                +{product.keywords.length - 4} more
-              </span>
+              <button
+                onClick={() => setShowAllTags(!showAllTags)}
+                className="px-2.5 py-1 text-xs bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition-colors"
+              >
+                {showAllTags ? 'Show less' : `+${product.keywords.length - 4} more`}
+              </button>
             )}
           </div>
         )}

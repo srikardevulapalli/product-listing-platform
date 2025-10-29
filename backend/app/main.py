@@ -13,7 +13,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5000")
+frontend_url = os.getenv("FRONTEND_URL", "https://boxsy.vercel.app/")
 
 app.add_middleware(
     CORSMiddleware,
