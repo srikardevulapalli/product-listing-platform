@@ -9,13 +9,13 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import Link from 'next/link';
-import { LogIn, Loader2, Mail, Lock, Chrome } from 'lucide-react';
+import { LogIn, Loader2, Mail, Lock } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, signInWithGoogle } = useAuth();
+  const { signIn } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,27 +34,6 @@ export default function LoginPage() {
       toast.error('Sign in failed', {
         id: toastId,
         description: err.message || 'Invalid email or password',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    setLoading(true);
-    const toastId = toast.loading('Signing in with Google...');
-
-    try {
-      await signInWithGoogle();
-      toast.success('Welcome!', {
-        id: toastId,
-        description: 'Successfully signed in with Google',
-      });
-      router.push('/dashboard');
-    } catch (err: any) {
-      toast.error('Google sign in failed', {
-        id: toastId,
-        description: err.message || 'Please try again',
       });
     } finally {
       setLoading(false);
@@ -127,28 +106,6 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-3 text-gray-500 font-medium">
-                Or continue with
-              </span>
-            </div>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full border-2 hover:bg-red-50 hover:border-red-300 transition-all"
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-          >
-            <Chrome className="mr-2 h-4 w-4" />
-            Sign in with Google
-          </Button>
 
           <p className="text-center text-sm text-gray-600 mt-6">
             Don't have an account?{' '}

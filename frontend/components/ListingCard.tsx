@@ -1,12 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import { Product } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Clock, CheckCircle2, XCircle, AlertCircle, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { deleteProduct } from '@/lib/api';
+import { toast } from 'sonner';
 
 interface ListingCardProps {
   product: Product;
+  onDelete?: () => void;
 }
 
 const statusConfig = {
@@ -27,9 +32,40 @@ const statusConfig = {
   },
 };
 
-export default function ListingCard({ product }: ListingCardProps) {
+export default function ListingCard({ product, onDelete }: ListingCardProps) {
+  const [expanded, setExpanded] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const config = statusConfig[product.status];
   const StatusIcon = config.icon;
+
+  const handleDelete = async () => {
+    if (!confirm(`Are you sure you want to delete "${product.title}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    setDeleting(true);
+    const toastId = toast.loading('Deleting product...');
+
+    try {
+      await deleteProduct(product.id);
+      toast.success('Product deleted', {
+        id: toastId,
+        description: `"${product.title}" has been removed`,
+      });
+      if (onDelete) {
+        onDelete();
+      }
+    } catch (err: any) {
+      toast.error('Failed to delete product', {
+        id: toastId,
+        description: err.response?.data?.detail || 'Please try again',
+      });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const shouldTruncate = product.description.length > 150;
 
   return (
     <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group">
@@ -52,9 +88,25 @@ export default function ListingCard({ product }: ListingCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="pb-3">
-        <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
+        <p className={`text-sm text-gray-600 leading-relaxed ${!expanded && shouldTruncate ? 'line-clamp-3' : ''}`}>
           {product.description}
         </p>
+        {shouldTruncate && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="text-blue-600 hover:text-blue-700 text-sm font-medium mt-2 flex items-center gap-1 transition-colors"
+          >
+            {expanded ? (
+              <>
+                Show less <ChevronUp className="h-4 w-4" />
+              </>
+            ) : (
+              <>
+                Read more <ChevronDown className="h-4 w-4" />
+              </>
+            )}
+          </button>
+        )}
         {product.keywords && product.keywords.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-3">
             {product.keywords.slice(0, 4).map((keyword, index) => (
@@ -73,13 +125,24 @@ export default function ListingCard({ product }: ListingCardProps) {
           </div>
         )}
       </CardContent>
-      <CardFooter className="text-xs text-gray-500 bg-gray-50 flex items-center gap-1.5 border-t">
-        <Clock className="h-3 w-3" />
-        Created: {new Date(product.created_at).toLocaleDateString('en-US', { 
-          month: 'short', 
-          day: 'numeric', 
-          year: 'numeric' 
-        })}
+      <CardFooter className="text-xs text-gray-500 bg-gray-50 flex items-center justify-between border-t">
+        <div className="flex items-center gap-1.5">
+          <Clock className="h-3 w-3" />
+          Created: {new Date(product.created_at).toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric', 
+            year: 'numeric' 
+          })}
+        </div>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={handleDelete}
+          disabled={deleting}
+          className="h-7 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </Button>
       </CardFooter>
     </Card>
   );

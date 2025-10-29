@@ -27,7 +27,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="max-w-2xl text-center space-y-6">
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
+        <h1 className="text-4xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
           Product Listing Platform
         </h1>
         <p className="text-xl text-muted-foreground">
@@ -35,11 +35,16 @@ export default function Home() {
         </p>
         <div className="flex gap-4 justify-center pt-4">
           <Link href="/auth/login">
-            <Button size="lg">Login</Button>
+            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">Login</Button>
           </Link>
           <Link href="/auth/register">
-            <Button size="lg" variant="outline">Sign Up</Button>
+            <Button size="lg" variant="outline" className="border-2">Sign Up</Button>
           </Link>
+        </div>
+        <div className="pt-8 border-t mt-8">
+          <p className="text-sm text-gray-500">
+            Developed by <span className="font-semibold text-blue-600">Srikar Devulapalli</span>
+          </p>
         </div>
       </div>
     </div>

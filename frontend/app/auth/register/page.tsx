@@ -15,7 +15,7 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signUp, signInWithGoogle } = useAuth();
+  const { signUp } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,20 +39,6 @@ export default function RegisterPage() {
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Failed to create account');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    setError('');
-    setLoading(true);
-
-    try {
-      await signInWithGoogle();
-      router.push('/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign in with Google');
     } finally {
       setLoading(false);
     }
@@ -109,27 +95,6 @@ export default function RegisterPage() {
               {loading ? 'Creating account...' : 'Sign Up'}
             </Button>
           </form>
-
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
-              </span>
-            </div>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-          >
-            Sign up with Google
-          </Button>
 
           <p className="text-center text-sm text-muted-foreground mt-4">
             Already have an account?{' '}
