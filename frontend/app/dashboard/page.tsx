@@ -106,7 +106,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex gap-2">
               <Link href="/upload">
-                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all">
+                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all text-white">
                   <Upload className="mr-2 h-4 w-4" />
                   Upload Product
                 </Button>
