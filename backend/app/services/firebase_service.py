@@ -23,17 +23,22 @@ class FirebaseService:
     
     def _initialize_firebase(self):
         if not firebase_admin._apps:
-            cred_path = os.getenv("FIREBASE_CREDENTIALS_PATH")
-            
             try:
-                if cred_path and os.path.exists(cred_path):
-                    cred = credentials.Certificate(cred_path)
-                    print(f"Using Firebase credentials from: {cred_path}")
-                else:
-                    print("Warning: No Firebase credentials file found. Using Application Default Credentials.")
-                    cred = credentials.ApplicationDefault()
+                service_account_json = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON")
                 
-                storage_bucket = os.getenv("FIREBASE_STORAGE_BUCKET")
+                if service_account_json:
+                    service_account_dict = json.loads(service_account_json)
+                    cred = credentials.Certificate(service_account_dict)
+                    storage_bucket = service_account_dict.get('project_id') + '.appspot.com'
+                    print(f"Using Firebase service account for project: {service_account_dict.get('project_id')}")
+                else:
+                    cred_path = os.getenv("FIREBASE_CREDENTIALS_PATH")
+                    if cred_path and os.path.exists(cred_path):
+                        cred = credentials.Certificate(cred_path)
+                        storage_bucket = os.getenv("FIREBASE_STORAGE_BUCKET")
+                        print(f"Using Firebase credentials from: {cred_path}")
+                    else:
+                        raise Exception("No Firebase credentials found. Please set FIREBASE_SERVICE_ACCOUNT_JSON environment variable.")
                 
                 firebase_admin.initialize_app(cred, {
                     'storageBucket': storage_bucket
